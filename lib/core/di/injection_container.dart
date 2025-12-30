@@ -1,6 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get_it/get_it.dart';
-import 'package:rzi_hifdhapp/features/book/data/datasources/book_local_data_source.dart';
+import 'package:rzi_hifdhapp/features/book/data/datasources/book_local_data_source_platform.dart';
 import 'package:rzi_hifdhapp/features/book/data/repositories/book_repository_impl.dart';
 import 'package:rzi_hifdhapp/features/book/domain/repositories/book_repository.dart';
 import 'package:rzi_hifdhapp/features/book/domain/usecases/get_books.dart';

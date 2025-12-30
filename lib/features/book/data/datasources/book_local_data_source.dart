@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rzi_hifdhapp/features/book/data/models/book_model.dart';
 import 'package:yaml/yaml.dart';
@@ -16,6 +18,12 @@ class BookLocalDataSourceImpl implements BookLocalDataSource {
   Future<List<BookModel>> getBooks() async {
     final appDir = await getApplicationDocumentsDirectory();
     final booksDir = Directory('${appDir.path}/books');
+
+    // On web, if no books exist, auto-load the bundled example book
+    if (kIsWeb && !await booksDir.exists()) {
+      await _loadBundledBookForWeb();
+    }
+
     if (!await booksDir.exists()) {
       return [];
     }
@@ -37,8 +45,42 @@ class BookLocalDataSourceImpl implements BookLocalDataSource {
     return books;
   }
 
+  Future<void> _loadBundledBookForWeb() async {
+    try {
+      // Load the bundled example.zip from assets
+      final byteData = await rootBundle.load('assets/example.zip');
+      final bytes = byteData.buffer.asUint8List();
+
+      final appDir = await getApplicationDocumentsDirectory();
+      final booksDir = Directory('${appDir.path}/books');
+      if (!await booksDir.exists()) {
+        await booksDir.create();
+      }
+
+      final bookName = 'example';
+      final bookDir = Directory('${booksDir.path}/$bookName');
+      if (await bookDir.exists()) {
+        await bookDir.delete(recursive: true);
+      }
+      await bookDir.create();
+
+      final archive = ZipDecoder().decodeBytes(bytes);
+      extractArchiveToDisk(archive, bookDir.path);
+    } catch (e) {
+      // Silently fail if bundled book can't be loaded
+      if (kDebugMode) {
+        print('Failed to load bundled book: $e');
+      }
+    }
+  }
+
   @override
   Future<void> importBook() async {
+    // On web, file picker is not supported, so we skip this operation
+    if (kIsWeb) {
+      return;
+    }
+
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['zip'],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:rzi_hifdhapp/features/book/presentation/bloc/book_bloc.dart';
@@ -25,12 +26,14 @@ class HomePage extends StatelessWidget {
         ),
         title: const Text('My Books'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              context.read<BookBloc>().add(ImportBookEvent());
-            },
-          ),
+          // Only show import button on non-web platforms
+          if (!kIsWeb)
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                context.read<BookBloc>().add(ImportBookEvent());
+              },
+            ),
         ],
       ),
       body: BlocBuilder<BookBloc, BookState>(
