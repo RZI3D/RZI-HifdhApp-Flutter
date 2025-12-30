@@ -7,6 +7,8 @@ import 'package:rzi_hifdhapp/features/book/domain/usecases/get_books.dart';
 import 'package:rzi_hifdhapp/features/book/domain/usecases/import_book.dart';
 import 'package:rzi_hifdhapp/features/book/presentation/bloc/book_bloc.dart';
 import 'package:rzi_hifdhapp/features/player/presentation/bloc/player_bloc.dart';
+import 'package:rzi_hifdhapp/features/settings/presentation/cubit/theme_cubit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
 
@@ -14,6 +16,7 @@ Future<void> init() async {
   // Blocs
   sl.registerFactory(() => BookBloc(getBooks: sl(), importBook: sl()));
   sl.registerFactory(() => PlayerBloc(audioPlayer: sl()));
+  sl.registerLazySingleton(() => ThemeCubit(sl()));
 
   // Use cases
   sl.registerLazySingleton(() => GetBooks(sl()));
@@ -21,12 +24,15 @@ Future<void> init() async {
 
   // Repositories
   sl.registerLazySingleton<BookRepository>(
-      () => BookRepositoryImpl(localDataSource: sl()));
+    () => BookRepositoryImpl(localDataSource: sl()),
+  );
 
   // Data sources
   sl.registerLazySingleton<BookLocalDataSource>(
-      () => BookLocalDataSourceImpl());
+    () => BookLocalDataSourceImpl(),
+  );
 
   // External
   sl.registerLazySingleton(() => AudioPlayer());
+  sl.registerLazySingleton(() => SharedPreferencesAsync());
 }

@@ -5,6 +5,7 @@ import 'package:rzi_hifdhapp/features/book/presentation/bloc/book_bloc.dart';
 import 'package:rzi_hifdhapp/features/book/presentation/bloc/book_event.dart';
 import 'package:rzi_hifdhapp/features/book/presentation/bloc/book_state.dart';
 import 'package:rzi_hifdhapp/features/book/presentation/pages/book_page.dart';
+import 'package:rzi_hifdhapp/features/settings/presentation/pages/settings_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -13,6 +14,15 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SettingsPage()),
+            );
+          },
+        ),
         title: const Text('My Books'),
         actions: [
           IconButton(
@@ -42,9 +52,7 @@ class HomePage extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => BookPage(book: book),
-                      ),
+                      MaterialPageRoute(builder: (_) => BookPage(book: book)),
                     );
                   },
                 );
@@ -53,9 +61,7 @@ class HomePage extends StatelessWidget {
           } else if (state is BookError) {
             return Center(child: Text(state.message));
           }
-          return const Center(
-            child: Text('Press + to import a book.'),
-          );
+          return const Center(child: Text('Press + to import a book.'));
         },
       ),
     );

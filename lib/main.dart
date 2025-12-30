@@ -4,6 +4,8 @@ import 'package:rzi_hifdhapp/features/book/presentation/bloc/book_bloc.dart';
 import 'package:rzi_hifdhapp/features/book/presentation/bloc/book_event.dart';
 import 'package:rzi_hifdhapp/features/book/presentation/pages/home_page.dart';
 import 'package:rzi_hifdhapp/features/player/presentation/bloc/player_bloc.dart';
+import 'package:rzi_hifdhapp/features/settings/presentation/cubit/theme_cubit.dart';
+import 'package:rzi_hifdhapp/features/settings/presentation/cubit/theme_state.dart';
 import 'package:rzi_hifdhapp/core/di/injection_container.dart' as di;
 
 void main() async {
@@ -19,20 +21,32 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => di.sl<BookBloc>()..add(LoadBooks()),
-        ),
-        BlocProvider(
-          create: (_) => di.sl<PlayerBloc>(),
-        ),
+        BlocProvider(create: (_) => di.sl<BookBloc>()..add(LoadBooks())),
+        BlocProvider(create: (_) => di.sl<PlayerBloc>()),
+        BlocProvider(create: (_) => di.sl<ThemeCubit>()),
       ],
-      child: MaterialApp(
-        title: 'Hifdh App',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const HomePage(),
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, themeState) {
+          return MaterialApp(
+            title: 'Hifdh App',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.blue,
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
+            ),
+            darkTheme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.blue,
+                brightness: Brightness.dark,
+              ),
+              useMaterial3: true,
+            ),
+            themeMode: themeState.themeMode,
+            home: const HomePage(),
+          );
+        },
       ),
     );
   }
